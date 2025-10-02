@@ -1,7 +1,7 @@
 formulas:
   group: species
 views:
-  - type: chart
+  - type: chart-scatter
     name: Chart
     filters:
       and:

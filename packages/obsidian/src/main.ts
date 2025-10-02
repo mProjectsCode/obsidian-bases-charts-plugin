@@ -1,5 +1,5 @@
 import { Plugin } from 'obsidian';
-import { CHART_VIEW_TYPE, ChartView } from 'packages/obsidian/src/ChartView';
+import { BAR_CHART_VIEW_TYPE, ChartView, LINE_CHART_VIEW_TYPE, SCATTER_CHART_VIEW_TYPE } from 'packages/obsidian/src/ChartView';
 import type { MyPluginSettings } from 'packages/obsidian/src/settings/Settings';
 import { DEFAULT_SETTINGS } from 'packages/obsidian/src/settings/Settings';
 import { SampleSettingTab } from 'packages/obsidian/src/settings/SettingTab';
@@ -13,11 +13,25 @@ export default class MyPlugin extends Plugin {
 
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 
-		this.registerBasesView(CHART_VIEW_TYPE, {
-			name: 'Chart',
-			icon: 'lucide-map',
-			factory: (controller, containerEl) => new ChartView(controller, containerEl),
-			options: () => ChartView.getViewOptions(),
+		this.registerBasesView(SCATTER_CHART_VIEW_TYPE, {
+			name: 'Scatter Chart',
+			icon: 'lucide-chart-scatter',
+			factory: (controller, containerEl) => new ChartView(SCATTER_CHART_VIEW_TYPE, controller, containerEl),
+			options: () => ChartView.getViewOptions(SCATTER_CHART_VIEW_TYPE),
+		});
+
+		this.registerBasesView(LINE_CHART_VIEW_TYPE, {
+			name: 'Line Chart',
+			icon: 'lucide-chart-line',
+			factory: (controller, containerEl) => new ChartView(LINE_CHART_VIEW_TYPE, controller, containerEl),
+			options: () => ChartView.getViewOptions(LINE_CHART_VIEW_TYPE),
+		});
+
+		this.registerBasesView(BAR_CHART_VIEW_TYPE, {
+			name: 'Bar Chart',
+			icon: 'lucide-chart-column',
+			factory: (controller, containerEl) => new ChartView(BAR_CHART_VIEW_TYPE, controller, containerEl),
+			options: () => ChartView.getViewOptions(BAR_CHART_VIEW_TYPE),
 		});
 	}
 

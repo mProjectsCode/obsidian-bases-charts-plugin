@@ -1,8 +1,11 @@
+import { UserConfig, defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import { UserConfig, defineConfig } from 'vite';
+import banner from 'vite-plugin-banner'
 import path from 'path';
 import builtins from 'builtin-modules';
+import { getBuildBanner } from './automation/build/buildBanner';
+
 
 const entryFile = 'packages/obsidian/src/main.ts';
 
@@ -10,12 +13,9 @@ export default defineConfig(async ({ mode }) => {
 	const { resolve } = path;
 	const prod = mode === 'production';
 
-	let plugins;
-	if (prod) {
-		plugins = [svelte()];
-	} else {
-		plugins = [
-			svelte(),
+	let plugins = [svelte(), banner(getBuildBanner(prod ? 'Release Build' : 'Dev Build', version => version))];
+	if (!prod) {
+		plugins.push(
 			viteStaticCopy({
 				targets: [
 					{
@@ -24,7 +24,7 @@ export default defineConfig(async ({ mode }) => {
 					},
 				],
 			}),
-		];
+		);
 	}
 
 	return {

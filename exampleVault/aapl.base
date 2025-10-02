@@ -1,0 +1,8 @@
+views:
+  - type: chart-line
+    name: View
+    filters:
+      and:
+        - file.folder == "aapl"
+    x: note.Date
+    y: note.Close

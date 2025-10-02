@@ -8,7 +8,9 @@ If your plugin does not need CSS, delete this file.
 */
 
 .bases-chart-container {
-	margin: var(--size-4-2);
+	width: 100%;
+	height: 100%;
+	padding: var(--size-4-2);
 }
 
 .bases-chart {
