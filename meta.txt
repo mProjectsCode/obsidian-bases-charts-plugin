@@ -1,0 +1,81 @@
+{
+	"inputs": {
+		"packages/obsidian/src/settings/Settings.ts": {
+			"bytes": 137,
+			"imports": [],
+			"format": "esm"
+		},
+		"packages/obsidian/src/settings/SettingTab.ts": {
+			"bytes": 664,
+			"imports": [
+				{
+					"path": "obsidian",
+					"kind": "import-statement",
+					"external": true
+				},
+				{
+					"path": "<runtime>",
+					"kind": "import-statement",
+					"external": true
+				}
+			],
+			"format": "esm"
+		},
+		"packages/obsidian/src/main.ts": {
+			"bytes": 657,
+			"imports": [
+				{
+					"path": "obsidian",
+					"kind": "import-statement",
+					"external": true
+				},
+				{
+					"path": "packages/obsidian/src/settings/Settings.ts",
+					"kind": "import-statement",
+					"original": "./settings/Settings"
+				},
+				{
+					"path": "packages/obsidian/src/settings/SettingTab.ts",
+					"kind": "import-statement",
+					"original": "./settings/SettingTab"
+				},
+				{
+					"path": "<runtime>",
+					"kind": "import-statement",
+					"external": true
+				}
+			],
+			"format": "esm"
+		}
+	},
+	"outputs": {
+		"main.js": {
+			"imports": [
+				{
+					"path": "obsidian",
+					"kind": "require-call",
+					"external": true
+				},
+				{
+					"path": "obsidian",
+					"kind": "require-call",
+					"external": true
+				}
+			],
+			"exports": [],
+			"entryPoint": "packages/obsidian/src/main.ts",
+			"inputs": {
+				"packages/obsidian/src/main.ts": {
+					"bytesInOutput": 387
+				},
+				"packages/obsidian/src/settings/Settings.ts": {
+					"bytesInOutput": 28
+				},
+				"packages/obsidian/src/settings/SettingTab.ts": {
+					"bytesInOutput": 418
+				}
+			},
+			"bytes": 2533
+		}
+	}
+}
