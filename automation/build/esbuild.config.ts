@@ -37,7 +37,8 @@ const build = await esbuild.build({
 	outfile: 'main.js',
 	minify: true,
 	metafile: true,
-	conditions: ['browser', 'production'],
+	mainFields: ['svelte', 'browser', 'module', 'main'],
+	conditions: ['browser', 'production', 'svelte'],
 	plugins: [
 		wasmPlugin,
 		esbuildSvelte({

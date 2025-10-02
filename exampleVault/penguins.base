@@ -1,0 +1,15 @@
+formulas:
+  group: species
+views:
+  - type: chart
+    name: Chart
+    filters:
+      and:
+        - file.folder == "penguins"
+    groupBy:
+      property: species
+      direction: ASC
+    order:
+      - file.name
+    x: note.culmen_length_mm
+    y: note.culmen_depth_mm

@@ -36,7 +36,8 @@ const context = await esbuild.context({
 	treeShaking: true,
 	outdir: `exampleVault/.obsidian/plugins/${manifest.id}/`,
 	outbase: 'packages/obsidian/src',
-	conditions: ['browser', 'development'],
+	mainFields: ['svelte', 'browser', 'module', 'main'],
+	conditions: ['browser', 'development', 'svelte'],
 	plugins: [
 		copy({
 			paths: [
@@ -52,7 +53,7 @@ const context = await esbuild.context({
 		}),
 		wasmPlugin,
 		esbuildSvelte({
-			compilerOptions: { css: 'injected', dev: false },
+			compilerOptions: { css: 'injected', dev: true },
 			preprocess: sveltePreprocess(),
 			filterWarnings: warning => {
 				// we don't want warnings from node modules that we can do nothing about
