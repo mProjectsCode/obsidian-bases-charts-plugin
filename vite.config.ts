@@ -11,20 +11,23 @@ const entryFile = 'packages/obsidian/src/main.ts';
 export default defineConfig(async ({ mode }) => {
 	const { resolve } = path;
 	const prod = mode === 'production';
+	const outDir = prod ? 'dist/' : `exampleVault/.obsidian/plugins/bases-charts/`;
 
-	let plugins = [svelte(), banner(getBuildBanner(prod ? 'Release Build' : 'Dev Build', version => version))];
-	if (!prod) {
-		plugins.push(
-			viteStaticCopy({
-				targets: [
-					{
-						src: 'manifest.json',
-						dest: `exampleVault/.obsidian/plugins/bases-charts/`,
-					},
-				],
-			}),
-		);
-	}
+	let plugins = [
+		svelte(),
+		banner({
+			outDir: outDir,
+			content: getBuildBanner(prod ? 'Release Build' : 'Dev Build', version => version),
+		}),
+		viteStaticCopy({
+			targets: [
+				{
+					src: 'manifest.json',
+					dest: outDir,
+				},
+			],
+		}),
+	];
 
 	return {
 		plugins: plugins,
@@ -50,7 +53,7 @@ export default defineConfig(async ({ mode }) => {
 					main: resolve(__dirname, entryFile),
 				},
 				output: {
-					dir: prod ? '.' : `exampleVault/.obsidian/plugins/bases-charts/`,
+					dir: outDir,
 					entryFileNames: 'main.js',
 					assetFileNames: 'styles.css',
 				},

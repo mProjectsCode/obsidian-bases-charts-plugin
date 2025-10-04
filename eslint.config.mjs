@@ -9,7 +9,7 @@ import eslintPluginSvelte from 'eslint-plugin-svelte';
 
 export default tseslint.config(
 	{
-		ignores: ['npm/', 'node_modules/', 'exampleVault/', 'automation/', 'main.js', '**/*.svelte', '**/*.d.ts'],
+		ignores: ['npm/', 'node_modules/', 'exampleVault/', 'automation/', 'dist/', '**/*.svelte', '**/*.d.ts'],
 	},
 	...eslintPluginSvelte.configs['flat/recommended'],
 	...eslintPluginSvelte.configs['flat/prettier'],
