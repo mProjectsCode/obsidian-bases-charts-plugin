@@ -13,3 +13,5 @@ views:
       - file.name
     x: note.culmen_length_mm
     y: note.culmen_depth_mm
+  - type: table
+    name: View

@@ -1,10 +1,13 @@
 views:
   - type: chart-bar
     name: Bar
+    filters:
+      and:
+        - file.folder == "bar"
     groupBy:
       property: Group
       direction: ASC
     x: note.Category
     y: note.Value
-    percentage: false
+    percentage: true
     labels: true
