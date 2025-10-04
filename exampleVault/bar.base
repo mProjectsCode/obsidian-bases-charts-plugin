@@ -1,0 +1,10 @@
+views:
+  - type: chart-bar
+    name: Bar
+    groupBy:
+      property: Group
+      direction: ASC
+    x: note.Category
+    y: note.Value
+    percentage: false
+    labels: true

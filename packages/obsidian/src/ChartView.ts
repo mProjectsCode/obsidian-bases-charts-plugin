@@ -1,9 +1,9 @@
-import type { BasesQueryResult, QueryController, Value } from 'obsidian';
+import type { BasesEntry, BasesQueryResult, QueryController, Value } from 'obsidian';
 import type { BasesPropertyId, ViewOption } from 'obsidian';
 import { BasesView, DateValue, Events, NumberValue, StringValue } from 'obsidian';
-import ScatterPlot from 'packages/obsidian/src/charts/ScatterPlot.svelte';
-import LinePlot from 'packages/obsidian/src/charts/LinePlot.svelte';
 import BarPlot from 'packages/obsidian/src/charts/BarPlot.svelte';
+import LinePlot from 'packages/obsidian/src/charts/LinePlot.svelte';
+import ScatterPlot from 'packages/obsidian/src/charts/ScatterPlot.svelte';
 import { mount, unmount } from 'svelte';
 
 export const SCATTER_CHART_VIEW_TYPE = 'chart-scatter';
@@ -16,6 +16,7 @@ export const X_FIELD = 'x';
 export const Y_FIELD = 'y';
 export const LABEL_FIELD = 'label';
 export const PERCENTAGE_FIELD = 'percentage';
+export const LABELS_FIELD = 'labels';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type ProcessedData = {
@@ -24,6 +25,68 @@ export type ProcessedData = {
 	label?: string;
 	group?: string;
 };
+
+export interface ProcessedGroupEntry {
+	key: string;
+	entries: ProcessedData[];
+}
+
+export type ProcessedGroupedData =
+	| {
+			grouped: true;
+			groups: ProcessedGroupEntry[];
+	  }
+	| {
+			grouped: false;
+			entries: ProcessedData[];
+	  };
+
+export class DataWrapper {
+	data: ProcessedGroupedData;
+
+	constructor(data: ProcessedGroupedData) {
+		this.data = data;
+	}
+
+	static empty(): DataWrapper {
+		return new DataWrapper({ grouped: false, entries: [] });
+	}
+
+	getFlat(): ProcessedData[] {
+		if (this.data.grouped) {
+			return this.data.groups.flatMap(g => g.entries);
+		} else {
+			return this.data.entries;
+		}
+	}
+
+	getStacked(): ProcessedData[] {
+		if (!this.data.grouped) {
+			return this.data.entries;
+		}
+
+		this.data.groups.sort((a, b) => a.key.localeCompare(b.key));
+
+		const xMap = new Map<number | Date | string, number>();
+		const stackedData: ProcessedData[] = [];
+
+		for (const group of this.data.groups) {
+			for (const entry of group.entries) {
+				const prevY = xMap.get(entry.x) ?? 0;
+				const newY = prevY + entry.y;
+
+				stackedData.push({
+					...entry,
+					y: newY,
+				});
+
+				xMap.set(entry.x, newY);
+			}
+		}
+
+		return stackedData;
+	}
+}
 
 export function parseValueAsNumber(value: Value | null): number | null {
 	if (!value) {
@@ -106,44 +169,89 @@ export class ChartView extends BasesView {
 		this.events.trigger('data-updated');
 	}
 
-	processData(): ProcessedData[] {
-		const data: ProcessedData[] = [];
-
+	processData(): DataWrapper {
 		const queryResult: BasesQueryResult | null = this.data;
 		const xField = this.config.getAsPropertyId(X_FIELD);
 		const yField = this.config.getAsPropertyId(Y_FIELD);
 		const labelField = this.config.getAsPropertyId(LABEL_FIELD);
 
 		if (!xField || !yField) {
-			return data;
+			return DataWrapper.empty();
 		}
 
-		for (const group of queryResult?.groupedData ?? []) {
-			for (const entry of group.entries) {
-				try {
-					const x = entry.getValue(xField);
-					const y = entry.getValue(yField);
-					const label = labelField ? entry.getValue(labelField) : null;
+		if (this.isGrouped()) {
+			const data: ProcessedGroupedData = {
+				grouped: true,
+				groups: [],
+			};
 
-					const xValue = parseValueAsX(x);
-					const yValue = parseValueAsNumber(y);
-					const labelStr = label?.toString();
+			for (const group of queryResult?.groupedData ?? []) {
+				const groupData: ProcessedGroupEntry = {
+					key: group.key!.toString(),
+					entries: [],
+				};
 
-					if (xValue !== null && yValue !== null) {
-						data.push({
-							x: xValue,
-							y: yValue,
-							label: labelStr,
-							group: group.key?.toString(),
-						});
+				for (const entry of group.entries) {
+					const processedEntry = this.processEntry(entry, xField, yField, labelField, group.key?.toString());
+					if (processedEntry) {
+						groupData.entries.push(processedEntry);
 					}
-				} catch (e) {
-					console.warn('Error processing entry', entry, e);
+				}
+
+				data.groups.push(groupData);
+			}
+
+			return new DataWrapper(data);
+		} else {
+			const data: ProcessedGroupedData = {
+				grouped: false,
+				entries: [],
+			};
+
+			for (const entry of queryResult?.data ?? []) {
+				const processedEntry = this.processEntry(entry, xField, yField, labelField, undefined);
+				if (processedEntry) {
+					data.entries.push(processedEntry);
 				}
 			}
+
+			return new DataWrapper(data);
+		}
+	}
+
+	isGrouped(): boolean {
+		return !(this.data.groupedData?.length === 1 && this.data.groupedData[0].key == null);
+	}
+
+	processEntry(
+		entry: BasesEntry,
+		xField: BasesPropertyId,
+		yField: BasesPropertyId,
+		labelField: BasesPropertyId | null,
+		group: string | undefined,
+	): ProcessedData | null {
+		try {
+			const x = entry.getValue(xField);
+			const y = entry.getValue(yField);
+			const label = labelField ? entry.getValue(labelField) : null;
+
+			const xValue = parseValueAsX(x);
+			const yValue = parseValueAsNumber(y);
+			const labelStr = label?.toString();
+
+			if (xValue !== null && yValue !== null) {
+				return {
+					x: xValue,
+					y: yValue,
+					label: labelStr,
+					group: group,
+				};
+			}
+		} catch (e) {
+			console.warn('Error processing entry', entry, e);
 		}
 
-		return data;
+		return null;
 	}
 
 	static getViewOptions(type: ChartViewType): ViewOption[] {
@@ -181,7 +289,7 @@ export class ChartView extends BasesView {
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
-		]
+		];
 	}
 
 	static lineViewOptions(): ViewOption[] {
@@ -207,11 +315,18 @@ export class ChartView extends BasesView {
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
-		]
+		];
 	}
 
 	static barViewOptions(): ViewOption[] {
 		return [
+			{
+				displayName: 'X Axis',
+				type: 'property',
+				key: X_FIELD,
+				filter: prop => !prop.startsWith('file.'),
+				placeholder: 'Property',
+			},
 			{
 				displayName: 'Y Axis',
 				type: 'property',
@@ -227,11 +342,17 @@ export class ChartView extends BasesView {
 				placeholder: 'Property',
 			},
 			{
+				displayName: 'Labels',
+				type: 'toggle',
+				key: LABELS_FIELD,
+				default: true,
+			},
+			{
 				displayName: 'Percentage',
 				type: 'toggle',
 				key: PERCENTAGE_FIELD,
 				default: false,
-			}
-		]
+			},
+		];
 	}
 }

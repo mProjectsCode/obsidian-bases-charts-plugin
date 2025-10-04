@@ -1,4 +1,4 @@
-import * as fs from "node:fs/promises";
+import * as fs from 'node:fs/promises';
 
 async function generateMarkdownFiles(datasetName: string) {
 	const csv = Bun.file(`exampleData/${datasetName}.csv`);
@@ -41,4 +41,4 @@ async function generateMarkdownFiles(datasetName: string) {
 generateMarkdownFiles('aapl');
 generateMarkdownFiles('penguins');
 
-export { };
+export {};

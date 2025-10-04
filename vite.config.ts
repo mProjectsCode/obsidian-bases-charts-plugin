@@ -1,11 +1,10 @@
 import { UserConfig, defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import banner from 'vite-plugin-banner'
+import banner from 'vite-plugin-banner';
 import path from 'path';
 import builtins from 'builtin-modules';
 import { getBuildBanner } from './automation/build/buildBanner';
-
 
 const entryFile = 'packages/obsidian/src/main.ts';
 
