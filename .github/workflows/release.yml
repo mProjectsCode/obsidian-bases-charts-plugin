@@ -12,7 +12,7 @@ env:
     PLUGIN_NAME: bases-charts # Change this to the name of your plugin-id folder
 
 permissions:
-    packages: write
+    contents: write
 
 jobs:
     build:
