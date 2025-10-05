@@ -1,8 +1,20 @@
+formulas:
+  year: date(Date).year.toString()
+properties:
+  formula.year:
+    displayName: Year
 views:
   - type: chart-line
     name: View
     filters:
       and:
         - file.folder == "aapl"
+    groupBy:
+      property: formula.year
+      direction: ASC
+    order:
+      - Low
+      - High
     x: note.Date
     y: note.Close
+    multi-chart-mode: Separate by group

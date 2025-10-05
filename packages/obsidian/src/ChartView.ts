@@ -12,16 +12,19 @@ export const BAR_CHART_VIEW_TYPE = 'chart-bar';
 
 export type ChartViewType = typeof SCATTER_CHART_VIEW_TYPE | typeof LINE_CHART_VIEW_TYPE | typeof BAR_CHART_VIEW_TYPE;
 
-export const X_FIELD = 'x';
-export const Y_FIELD = 'y';
-export const LABEL_FIELD = 'label';
-export const PERCENTAGE_FIELD = 'percentage';
-export const LABELS_FIELD = 'labels';
+export const CHART_SETTINGS = {
+	X: 'x',
+	LABEL: 'label',
+	SHOW_PERCENTAGES: 'show-percentages',
+	SHOW_LABELS: 'show-labels',
+	MULTI_CHART: 'multi-chart-mode',
+} as const;
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type ProcessedData = {
 	x: number | Date | string;
 	y: number;
+	yProperty: BasesPropertyId;
 	label?: string;
 	group?: string;
 };
@@ -41,37 +44,109 @@ export type ProcessedGroupedData =
 			entries: ProcessedData[];
 	  };
 
-export class DataWrapper {
-	data: ProcessedGroupedData;
+export enum MultiChartMode {
+	GROUP = 'Separate by group',
+	PROPERTY = 'Separate by property',
+}
 
-	constructor(data: ProcessedGroupedData) {
+export class DataWrapper {
+	readonly data: ProcessedGroupedData;
+	readonly properties: BasesPropertyId[];
+	readonly mode: MultiChartMode;
+
+	constructor(data: ProcessedGroupedData, properties: BasesPropertyId[], mode: MultiChartMode) {
 		this.data = data;
+		this.properties = properties;
+		this.mode = mode;
+
+		if (this.data.grouped) {
+			this.data.groups.sort((a, b) => a.key.localeCompare(b.key));
+		}
 	}
 
 	static empty(): DataWrapper {
-		return new DataWrapper({ grouped: false, entries: [] });
+		return new DataWrapper({ grouped: false, entries: [] }, [], MultiChartMode.PROPERTY);
 	}
 
-	getFlat(): ProcessedData[] {
-		if (this.data.grouped) {
-			return this.data.groups.flatMap(g => g.entries);
+	getCharts(): string[] {
+		if (this.mode === MultiChartMode.GROUP) {
+			if (this.data.grouped) {
+				return this.data.groups.map(g => g.key);
+			} else {
+				return ['All'];
+			}
 		} else {
-			return this.data.entries;
+			return this.properties;
 		}
 	}
 
-	getStacked(): ProcessedData[] {
+	getChartName(chart: string, view: ChartView): string {
+		if (this.mode === MultiChartMode.GROUP) {
+			return chart;
+		} else {
+			const xProp = view.config.getAsPropertyId(CHART_SETTINGS.X);
+			return xProp ? view.config.getDisplayName(xProp) : 'Unknown';
+		}
+	}
+
+	getChartGroup(): string {
+		if (this.mode === MultiChartMode.GROUP && this.properties.length > 1) {
+			return 'group';
+		} else if (this.mode === MultiChartMode.PROPERTY && this.data.grouped) {
+			return 'group';
+		}
+
+		return 'var(--bases-charts-accent)';
+	}
+
+	hasMultipleGroups(): boolean {
+		return (this.mode === MultiChartMode.GROUP && this.properties.length > 1) || (this.mode === MultiChartMode.PROPERTY && this.data.grouped);
+	}
+
+	getFlat(chart: string, sorted: boolean = false): ProcessedData[] {
+		let data: ProcessedData[];
+
+		if (this.mode === MultiChartMode.GROUP) {
+			if (this.data.grouped) {
+				const group = this.data.groups.find(g => g.key === chart);
+				data = group ? group.entries : [];
+			} else {
+				data = this.data.entries;
+			}
+		} else {
+			if (this.data.grouped) {
+				data = this.data.groups.flatMap(g => g.entries.filter(d => d.yProperty === chart));
+			} else {
+				data = this.data.entries.filter(d => d.yProperty === chart);
+			}
+		}
+
+		if (sorted) {
+			data = data.sort((a, b) => {
+				if (a.group != null && b.group != null) {
+					return a.group.localeCompare(b.group);
+				}
+				return 0;
+			});
+		}
+
+		return data;
+	}
+
+	getStacked(chart: string): ProcessedData[] {
+		if (this.mode === MultiChartMode.GROUP) {
+			throw new Error('Stacked data is only available in property mode');
+		}
+
 		if (!this.data.grouped) {
 			return this.data.entries;
 		}
-
-		this.data.groups.sort((a, b) => a.key.localeCompare(b.key));
 
 		const xMap = new Map<number | Date | string, number>();
 		const stackedData: ProcessedData[] = [];
 
 		for (const group of this.data.groups) {
-			for (const entry of group.entries) {
+			for (const entry of group.entries.filter(d => d.yProperty === chart)) {
 				const prevY = xMap.get(entry.x) ?? 0;
 				const newY = prevY + entry.y;
 
@@ -171,11 +246,17 @@ export class ChartView extends BasesView {
 
 	processData(): DataWrapper {
 		const queryResult: BasesQueryResult | null = this.data;
-		const xField = this.config.getAsPropertyId(X_FIELD);
-		const yField = this.config.getAsPropertyId(Y_FIELD);
-		const labelField = this.config.getAsPropertyId(LABEL_FIELD);
+		const xField = this.config.getAsPropertyId(CHART_SETTINGS.X);
+		const labelField = this.config.getAsPropertyId(CHART_SETTINGS.LABEL);
+		const mode = this.config.get(CHART_SETTINGS.MULTI_CHART) ?? MultiChartMode.PROPERTY;
 
-		if (!xField || !yField) {
+		if (mode !== MultiChartMode.GROUP && mode !== MultiChartMode.PROPERTY) {
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
+			console.warn(`Invalid multi chart mode: ${mode}`);
+			return DataWrapper.empty();
+		}
+
+		if (!xField) {
 			return DataWrapper.empty();
 		}
 
@@ -192,16 +273,14 @@ export class ChartView extends BasesView {
 				};
 
 				for (const entry of group.entries) {
-					const processedEntry = this.processEntry(entry, xField, yField, labelField, group.key?.toString());
-					if (processedEntry) {
-						groupData.entries.push(processedEntry);
-					}
+					const processedEntry = this.processEntry(entry, xField, labelField, group.key?.toString(), mode);
+					groupData.entries.push(...processedEntry);
 				}
 
 				data.groups.push(groupData);
 			}
 
-			return new DataWrapper(data);
+			return new DataWrapper(data, this.data.properties, mode);
 		} else {
 			const data: ProcessedGroupedData = {
 				grouped: false,
@@ -209,13 +288,11 @@ export class ChartView extends BasesView {
 			};
 
 			for (const entry of queryResult?.data ?? []) {
-				const processedEntry = this.processEntry(entry, xField, yField, labelField, undefined);
-				if (processedEntry) {
-					data.entries.push(processedEntry);
-				}
+				const processedEntry = this.processEntry(entry, xField, labelField, undefined, mode);
+				data.entries.push(...processedEntry);
 			}
 
-			return new DataWrapper(data);
+			return new DataWrapper(data, this.data.properties, mode);
 		}
 	}
 
@@ -226,32 +303,42 @@ export class ChartView extends BasesView {
 	processEntry(
 		entry: BasesEntry,
 		xField: BasesPropertyId,
-		yField: BasesPropertyId,
 		labelField: BasesPropertyId | null,
 		group: string | undefined,
-	): ProcessedData | null {
+		mode: MultiChartMode,
+	): ProcessedData[] {
 		try {
 			const x = entry.getValue(xField);
-			const y = entry.getValue(yField);
 			const label = labelField ? entry.getValue(labelField) : null;
-
 			const xValue = parseValueAsX(x);
-			const yValue = parseValueAsNumber(y);
 			const labelStr = label?.toString();
 
-			if (xValue !== null && yValue !== null) {
-				return {
-					x: xValue,
-					y: yValue,
-					label: labelStr,
-					group: group,
-				};
+			if (xValue === null) {
+				return [];
 			}
+
+			const result: ProcessedData[] = [];
+			for (const prop of this.data.properties) {
+				const yValue = parseValueAsNumber(entry.getValue(prop));
+				const yName = this.config.getDisplayName(prop);
+
+				if (xValue !== null && yValue !== null) {
+					result.push({
+						x: xValue,
+						y: yValue,
+						yProperty: prop,
+						label: labelStr,
+						group: mode === MultiChartMode.GROUP ? yName : group,
+					});
+				}
+			}
+
+			return result;
 		} catch (e) {
 			console.warn('Error processing entry', entry, e);
 		}
 
-		return null;
+		return [];
 	}
 
 	static getViewOptions(type: ChartViewType): ViewOption[] {
@@ -269,23 +356,26 @@ export class ChartView extends BasesView {
 	static scatterViewOptions(): ViewOption[] {
 		return [
 			{
-				displayName: 'X Axis',
-				type: 'property',
-				key: X_FIELD,
-				filter: prop => !prop.startsWith('file.'),
-				placeholder: 'Property',
+				displayName: 'Multi chart mode',
+				type: 'dropdown',
+				key: CHART_SETTINGS.MULTI_CHART,
+				options: {
+					[MultiChartMode.GROUP]: MultiChartMode.GROUP,
+					[MultiChartMode.PROPERTY]: MultiChartMode.PROPERTY,
+				},
+				default: MultiChartMode.PROPERTY,
 			},
 			{
-				displayName: 'Y Axis',
+				displayName: 'X Axis',
 				type: 'property',
-				key: Y_FIELD,
+				key: CHART_SETTINGS.X,
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
 			{
 				displayName: 'Label',
 				type: 'property',
-				key: LABEL_FIELD,
+				key: CHART_SETTINGS.LABEL,
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
@@ -295,23 +385,26 @@ export class ChartView extends BasesView {
 	static lineViewOptions(): ViewOption[] {
 		return [
 			{
-				displayName: 'X Axis',
-				type: 'property',
-				key: X_FIELD,
-				filter: prop => !prop.startsWith('file.'),
-				placeholder: 'Property',
+				displayName: 'Multi chart mode',
+				type: 'dropdown',
+				key: CHART_SETTINGS.MULTI_CHART,
+				options: {
+					[MultiChartMode.GROUP]: MultiChartMode.GROUP,
+					[MultiChartMode.PROPERTY]: MultiChartMode.PROPERTY,
+				},
+				default: MultiChartMode.PROPERTY,
 			},
 			{
-				displayName: 'Y Axis',
+				displayName: 'X Axis',
 				type: 'property',
-				key: Y_FIELD,
+				key: CHART_SETTINGS.X,
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
 			{
 				displayName: 'Label',
 				type: 'property',
-				key: LABEL_FIELD,
+				key: CHART_SETTINGS.LABEL,
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
@@ -323,34 +416,27 @@ export class ChartView extends BasesView {
 			{
 				displayName: 'X Axis',
 				type: 'property',
-				key: X_FIELD,
-				filter: prop => !prop.startsWith('file.'),
-				placeholder: 'Property',
-			},
-			{
-				displayName: 'Y Axis',
-				type: 'property',
-				key: Y_FIELD,
+				key: CHART_SETTINGS.X,
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
 			{
 				displayName: 'Label',
 				type: 'property',
-				key: LABEL_FIELD,
+				key: CHART_SETTINGS.LABEL,
 				filter: prop => !prop.startsWith('file.'),
 				placeholder: 'Property',
 			},
 			{
-				displayName: 'Labels',
+				displayName: 'Show labels',
 				type: 'toggle',
-				key: LABELS_FIELD,
+				key: CHART_SETTINGS.SHOW_LABELS,
 				default: true,
 			},
 			{
-				displayName: 'Percentage',
+				displayName: 'Show as percentages',
 				type: 'toggle',
-				key: PERCENTAGE_FIELD,
+				key: CHART_SETTINGS.SHOW_PERCENTAGES,
 				default: false,
 			},
 		];

@@ -1,3 +1,5 @@
+import type { DataWrapper } from 'packages/obsidian/src/ChartView';
+
 export function toCompactString(datum: number | string | symbol | boolean | Date | null | undefined): string {
 	if (datum == null) {
 		return '';
@@ -27,3 +29,16 @@ export const OBSIDIAN_COLOR_PALETTE = [
 	'var(--color-purple)',
 	'var(--color-pink)',
 ];
+
+export interface ChartProps {
+	data: DataWrapper;
+	chart: string;
+	xName: string;
+	isGrouped: boolean;
+	group: string;
+}
+
+export type FullChartProps = ChartProps & {
+	width: number;
+	height: number;
+};

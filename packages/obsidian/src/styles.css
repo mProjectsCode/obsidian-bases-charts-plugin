@@ -1,25 +1,17 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
-
 body {
 	--bases-charts-text: var(--text-normal);
+	--bases-charts-muted: var(--color-base-60);
 	--bases-charts-grid: var(--color-base-30);
 	--bases-charts-accent: var(--color-accent);
 }
 
-.bases-chart-container {
-	width: 100%;
-	height: 100%;
-	padding: var(--size-4-2);
-}
+.bases-charts-plot {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
 
-.bases-chart {
 	.plot-header {
 		margin: 0;
 	}
