@@ -2,7 +2,7 @@
 	import { AxisX, AxisY, BarY, GridY, Plot, Text } from 'svelteplot';
 	import { CHART_SETTINGS, ChartView } from '../ChartView';
 	import { onMount } from 'svelte';
-	import { OBSIDIAN_COLOR_PALETTE, toCompactString } from '../utils';
+	import { OBSIDIAN_COLOR_PALETTE, toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
 
 	interface Props {
@@ -29,11 +29,10 @@
 </script>
 
 <PlotGrid view={view}>
-	{#snippet chartSnippet({ data, chart, xName, group, height })}
+	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height })}
 		<Plot
-			color={{ legend: true, scheme: OBSIDIAN_COLOR_PALETTE as unknown as string }}
 			x={{ label: xName, type: 'band' }}
-			y={{ label: `↑ ${data.getChartName(chart, view)}`, tickFormat: show_percentages ? d => `${String(d)}%` : d => toCompactString(d) }}
+			y={{ label: `↑ ${data.getChartName(chartIndex)}`, tickFormat: show_percentages ? d => `${String(d)}%` : d => toCompactString(d) }}
 			height={height}
 			class="bases-charts-plot"
 		>
@@ -41,10 +40,10 @@
 			<AxisY fill="var(--bases-charts-text)" stroke="var(--bases-charts-text)" opacity={1} />
 			<GridY stroke="var(--bases-charts-grid)" strokeOpacity={1} />
 
-			<BarY data={data.getFlat(chart)} x="x" y="y" fill={group} />
+			<BarY data={data.getFlat(chartIndex)} x="x" y="y" fill={groupFn} />
 			{#if show_labels}
 				<Text
-					data={data.getStacked(chart)}
+					data={data.getStacked(chartIndex)}
 					x="x"
 					y="y"
 					fill="var(--bases-charts-text)"

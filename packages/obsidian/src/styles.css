@@ -1,8 +1,10 @@
 body {
 	--bases-charts-text: var(--text-normal);
-	--bases-charts-muted: var(--color-base-60);
-	--bases-charts-grid: var(--color-base-30);
+	--bases-charts-grid: var(--background-modifier-border);
+	--bases-charts-grid-hover: var(--background-modifier-border);
 	--bases-charts-accent: var(--color-accent);
+	--bases-charts-min-width: 350px;
+	--bases-charts-min-height: 350px;
 }
 
 .bases-charts-plot {

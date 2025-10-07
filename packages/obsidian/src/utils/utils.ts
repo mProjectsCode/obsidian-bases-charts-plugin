@@ -1,4 +1,4 @@
-import type { DataWrapper } from 'packages/obsidian/src/ChartView';
+import type { AbstractDataWrapper, ProcessedData } from 'packages/obsidian/src/ChartView';
 
 export function toCompactString(datum: number | string | symbol | boolean | Date | null | undefined): string {
 	if (datum == null) {
@@ -30,15 +30,18 @@ export const OBSIDIAN_COLOR_PALETTE = [
 	'var(--color-pink)',
 ];
 
-export interface ChartProps {
-	data: DataWrapper;
-	chart: string;
+export const OBSIDIAN_DEFAULT_SINGLE_COLOR = (_: unknown): string => 'var(--bases-charts-accent)';
+
+export interface ChartProps<ChartId, GroupId> {
+	data: AbstractDataWrapper<ChartId, GroupId>;
+	chartIndex: number;
 	xName: string;
 	isGrouped: boolean;
-	group: string;
+	groupFn: (d: ProcessedData) => string;
 }
 
-export type FullChartProps = ChartProps & {
+export type FullChartProps<ChartId, GroupId> = ChartProps<ChartId, GroupId> & {
 	width: number;
 	height: number;
+	setHoveredData: (data: ProcessedData[]) => void;
 };
