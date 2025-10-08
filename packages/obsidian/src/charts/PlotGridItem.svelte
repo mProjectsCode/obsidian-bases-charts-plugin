@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { ChartProps, FullChartProps } from '../utils/utils';
-	import type { ChartView, ProcessedData } from '../ChartView';
+	import type { ChartView } from '../ChartView';
+	import type { ProcessedData } from '../ChartData';
 
 	interface Props {
 		view: ChartView;
@@ -13,6 +14,7 @@
 
 	let width = $state(0);
 	let height = $state(0);
+	let enoughSpace = $derived(width > 100 && height > 100);
 
 	let hoveredData: ProcessedData[] = $state([]);
 
@@ -34,12 +36,16 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="bases-charts-plot-grid-item" bind:clientWidth={width} bind:clientHeight={height} onclick={onClick}>
-	{@render chartSnippet({
-		...chartProps,
-		width,
-		height,
-		setHoveredData,
-	})}
+	{#if enoughSpace}
+		{@render chartSnippet({
+			...chartProps,
+			width,
+			height,
+			setHoveredData,
+		})}
+	{:else}
+		<span>Not enough space to display chart.</span>
+	{/if}
 </div>
 
 <style>

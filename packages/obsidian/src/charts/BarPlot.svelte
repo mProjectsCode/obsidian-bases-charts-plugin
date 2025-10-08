@@ -2,7 +2,7 @@
 	import { AxisX, AxisY, BarY, GridY, Plot, Text } from 'svelteplot';
 	import { CHART_SETTINGS, ChartView } from '../ChartView';
 	import { onMount } from 'svelte';
-	import { OBSIDIAN_COLOR_PALETTE, toCompactString } from '../utils/utils';
+	import { toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
 
 	interface Props {

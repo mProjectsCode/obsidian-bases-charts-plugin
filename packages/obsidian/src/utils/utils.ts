@@ -1,4 +1,6 @@
-import type { AbstractDataWrapper, ProcessedData } from 'packages/obsidian/src/ChartView';
+import type { Value } from 'obsidian';
+import { DateValue, NumberValue, StringValue } from 'obsidian';
+import type { AbstractDataWrapper, ProcessedData } from 'packages/obsidian/src/ChartData';
 
 export function toCompactString(datum: number | string | symbol | boolean | Date | null | undefined): string {
 	if (datum == null) {
@@ -45,3 +47,36 @@ export type FullChartProps<ChartId, GroupId> = ChartProps<ChartId, GroupId> & {
 	height: number;
 	setHoveredData: (data: ProcessedData[]) => void;
 };
+
+export function parseValueAsNumber(value: Value | null): number | null {
+	if (!value) {
+		return null;
+	}
+
+	if (value instanceof NumberValue) {
+		return value.data;
+	}
+	if (value instanceof StringValue) {
+		const parsed = parseFloat(value.data);
+		return isNaN(parsed) ? null : parsed;
+	}
+	return null;
+}
+
+export function parseValueAsX(value: Value | null): number | Date | string | null {
+	if (!value) {
+		return null;
+	}
+
+	if (value instanceof NumberValue) {
+		return value.data;
+	}
+	if (value instanceof StringValue) {
+		const parsed = parseFloat(value.data);
+		return isNaN(parsed) ? value.data : parsed;
+	}
+	if (value instanceof DateValue) {
+		return new Date(value.toString());
+	}
+	return null;
+}

@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
-	import { AbstractDataWrapper, CHART_SETTINGS, type ChartView, type DataWrapper } from '../ChartView';
+	import { CHART_SETTINGS, type ChartView } from '../ChartView';
 	import { OBSIDIAN_DEFAULT_SINGLE_COLOR, type FullChartProps } from '../utils/utils';
 	import PlotGridItem from './PlotGridItem.svelte';
+	import type { DataWrapper } from '../ChartData';
 
 	interface Props {
 		view: ChartView;

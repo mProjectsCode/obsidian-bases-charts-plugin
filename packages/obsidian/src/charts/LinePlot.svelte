@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Line, Plot, GridX, GridY, AxisY, AxisX, Pointer, Text, Dot, RuleX } from 'svelteplot';
 	import { ChartView } from '../ChartView';
-	import { OBSIDIAN_COLOR_PALETTE, toCompactString } from '../utils/utils';
+	import { toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
 
 	interface Props {
