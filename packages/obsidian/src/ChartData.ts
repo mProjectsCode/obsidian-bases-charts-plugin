@@ -173,6 +173,10 @@ export abstract class AbstractDataWrapper<ChartId, GroupId> {
 
 export class GroupSeparatedData extends AbstractDataWrapper<string, BasesPropertyId> {
 	getChartIdentifiers(): string[] {
+		// if the data is not grouped, the groupBySet will be empty
+		if (this.groupBySet.length === 0) {
+			return ['No group'];
+		}
 		return this.groupBySet;
 	}
 

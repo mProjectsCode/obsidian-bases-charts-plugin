@@ -116,7 +116,7 @@ export class ChartView extends BasesView {
 		}
 
 		const data: ProcessedData[] = [];
-		const groupBySet = this.data.groupedData.map(g => g.key?.toString()).filter(v => v != null);
+		const groupBySet = this.data.groupedData.map(g => g.key?.toString()).filter(k => k != null);
 		groupBySet.sort();
 
 		for (const group of this.data?.groupedData ?? []) {
@@ -139,10 +139,6 @@ export class ChartView extends BasesView {
 		} else {
 			return new PropertySeparatedData(this, data, groupBySet);
 		}
-	}
-
-	isGrouped(): boolean {
-		return !(this.data.groupedData?.length === 1 && this.data.groupedData[0].key == null);
 	}
 
 	processEntry(entry: BasesEntry, xField: BasesPropertyId, propertyOrder: BasesPropertyId[], groupIndex: number, mode: MultiChartMode): ProcessedData[] {

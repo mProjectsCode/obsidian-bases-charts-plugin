@@ -36,7 +36,7 @@
 
 <div class="bases-charts-plot-legend">
 	{#if data}
-		{#each data?.getGroupIdentifiers() ?? [] as _, groupIndex}
+		{#each data.getGroupIdentifiers() as _, groupIndex}
 			<div class="bases-charts-plot-legend-item">
 				<div class="bases-charts-plot-legend-color" style="--color: {data.getColorFromGroupIndex(groupIndex)}"></div>
 				<span class="bases-charts-plot-legend-label">{data.getGroupName(groupIndex)}</span>
