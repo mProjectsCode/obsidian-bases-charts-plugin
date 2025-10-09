@@ -1,5 +1,5 @@
 import type { BasesPropertyId } from 'obsidian';
-import type { ChartView } from 'packages/obsidian/src/ChartView';
+import type { ChartView, YDomainOverrides } from 'packages/obsidian/src/ChartView';
 import { OBSIDIAN_DEFAULT_SINGLE_COLOR, OBSIDIAN_COLOR_PALETTE } from 'packages/obsidian/src/utils/utils';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -25,11 +25,14 @@ export abstract class AbstractDataWrapper<ChartId, GroupId> {
 	readonly view: ChartView;
 	readonly data: ProcessedData[];
 	readonly groupBySet: string[];
+	readonly yDomain: YDomainOverrides;
 
 	constructor(view: ChartView, data: ProcessedData[], groupBySet: string[]) {
 		this.view = view;
 		this.data = data;
 		this.groupBySet = groupBySet;
+
+		this.yDomain = this.getYDomain();
 	}
 
 	abstract getChartIdentifiers(): ChartId[];
@@ -89,6 +92,82 @@ export abstract class AbstractDataWrapper<ChartId, GroupId> {
 		}
 
 		return stackedData;
+	}
+
+	getYDomainForChart(chartIndex: number): [number, number] {
+		const overrides = this.yDomain;
+
+		const min = overrides.min ?? this.getChartYMin(chartIndex);
+		const max = overrides.max ?? this.getChartYMax(chartIndex);
+
+		return [min ?? 0, max ?? 0];
+	}
+
+	getYDomain(): YDomainOverrides {
+		const viewOverrides = this.view.getYDomainOverrides();
+
+		if (viewOverrides.synced) {
+			viewOverrides.min ??= this.getGlobalYMin();
+			viewOverrides.max ??= this.getGlobalYMax();
+		}
+
+		return viewOverrides;
+	}
+
+	getGlobalYMin(): number | null {
+		let globalMin: number | null = null;
+
+		for (let i = 0; i < this.getChartIdentifiers().length; i++) {
+			const chartData = this.getFlat(i);
+			for (const entry of chartData) {
+				if (globalMin === null || entry.y < globalMin) {
+					globalMin = entry.y;
+				}
+			}
+		}
+
+		return globalMin;
+	}
+
+	getGlobalYMax(): number | null {
+		let globalMax: number | null = null;
+
+		for (let i = 0; i < this.getChartIdentifiers().length; i++) {
+			const chartData = this.getFlat(i);
+			for (const entry of chartData) {
+				if (globalMax === null || entry.y > globalMax) {
+					globalMax = entry.y;
+				}
+			}
+		}
+
+		return globalMax;
+	}
+
+	getChartYMin(chartIndex: number): number | null {
+		let chartMin: number | null = null;
+
+		const chartData = this.getFlat(chartIndex);
+		for (const entry of chartData) {
+			if (chartMin === null || entry.y < chartMin) {
+				chartMin = entry.y;
+			}
+		}
+
+		return chartMin;
+	}
+
+	getChartYMax(chartIndex: number): number | null {
+		let chartMax: number | null = null;
+
+		const chartData = this.getFlat(chartIndex);
+		for (const entry of chartData) {
+			if (chartMax === null || entry.y > chartMax) {
+				chartMax = entry.y;
+			}
+		}
+
+		return chartMax;
 	}
 }
 

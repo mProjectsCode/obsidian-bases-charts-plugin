@@ -14,7 +14,13 @@
 <PlotGrid view={view}>
 	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height, setHoveredData })}
 		{@const dataPoints = data.getFlat(chartIndex)}
-		<Plot grid x={{ label: xName }} y={{ label: `↑ ${data.getChartName(chartIndex)}` }} height={height} class="bases-charts-plot">
+		<Plot
+			grid
+			x={{ label: xName }}
+			y={{ label: `↑ ${data.getChartName(chartIndex)}`, domain: data.getYDomainForChart(chartIndex) }}
+			height={height}
+			class="bases-charts-plot"
+		>
 			<AxisX fill="var(--bases-charts-text)" stroke="var(--bases-charts-text)" opacity={1} />
 			<AxisY fill="var(--bases-charts-text)" stroke="var(--bases-charts-text)" opacity={1} />
 			<GridX stroke="var(--bases-charts-grid)" strokeOpacity={1} />
