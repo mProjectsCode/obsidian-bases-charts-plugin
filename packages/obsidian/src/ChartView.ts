@@ -103,6 +103,7 @@ export class ChartView extends BasesView {
 	processData(): DataWrapper {
 		const xField = this.config.getAsPropertyId(CHART_SETTINGS.X);
 		const mode = this.config.get(CHART_SETTINGS.MULTI_CHART) ?? MultiChartMode.PROPERTY;
+		const propertyOrder = this.config.getOrder();
 
 		if (mode !== MultiChartMode.GROUP && mode !== MultiChartMode.PROPERTY) {
 			// eslint-disable-next-line @typescript-eslint/no-base-to-string
@@ -128,7 +129,7 @@ export class ChartView extends BasesView {
 			}
 
 			for (const entry of group.entries) {
-				const processedEntry = this.processEntry(entry, xField, groupIndex, mode);
+				const processedEntry = this.processEntry(entry, xField, propertyOrder, groupIndex, mode);
 				data.push(...processedEntry);
 			}
 		}
@@ -144,7 +145,7 @@ export class ChartView extends BasesView {
 		return !(this.data.groupedData?.length === 1 && this.data.groupedData[0].key == null);
 	}
 
-	processEntry(entry: BasesEntry, xField: BasesPropertyId, groupIndex: number, mode: MultiChartMode): ProcessedData[] {
+	processEntry(entry: BasesEntry, xField: BasesPropertyId, propertyOrder: BasesPropertyId[], groupIndex: number, mode: MultiChartMode): ProcessedData[] {
 		try {
 			const x = entry.getValue(xField);
 			const xValue = parseValueAsX(x);
@@ -154,8 +155,8 @@ export class ChartView extends BasesView {
 			}
 
 			const result: ProcessedData[] = [];
-			for (let i = 0; i < this.data.properties.length; i++) {
-				const prop = this.data.properties[i];
+			let i = 0;
+			for (const prop of propertyOrder) {
 				const yValue = parseValueAsNumber(entry.getValue(prop));
 
 				if (xValue !== null && yValue !== null) {
@@ -167,6 +168,8 @@ export class ChartView extends BasesView {
 						file: entry.file.path,
 					});
 				}
+
+				i++;
 			}
 
 			return result;

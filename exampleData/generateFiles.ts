@@ -16,7 +16,7 @@ async function generateMarkdownFiles(datasetName: string) {
 		return entry;
 	});
 
-	console.log(`Found ${data.length} entries`);
+	console.log(`Found ${data.length} ${datasetName} entries`);
 
 	if (await fs.exists(`exampleVault/${datasetName}`)) {
 		await fs.rm(`exampleVault/${datasetName}`, { recursive: true });
@@ -29,13 +29,15 @@ async function generateMarkdownFiles(datasetName: string) {
 		const yaml = Object.entries(entry)
 			.map(([key, value]) => `${key}: ${value}`)
 			.join('\n');
-		const content = `---\n${yaml}\n---`;
+		const content = `---\n${yaml}\n---\n`;
 
 		const file = Bun.file(`exampleVault/${datasetName}/${i}.md`);
 		await file.write(content);
 
 		i++;
 	}
+
+	console.log(`Created ${data.length} ${datasetName} notes`);
 }
 
 generateMarkdownFiles('aapl');

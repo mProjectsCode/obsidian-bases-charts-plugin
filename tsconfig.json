@@ -19,7 +19,7 @@
 		"sourceMap": true,
 		"lib": ["DOM", "ESNext"],
 		"allowSyntheticDefaultImports": true,
-		"types": ["obsidian-typings", "bun"]
+		"types": ["bun"]
 	},
 	"include": ["packages/obsidian/src/**/*.ts", "packages/obsidian/src/**/*.svelte", "tests/**/*.ts"]
 }

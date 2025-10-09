@@ -10,6 +10,5 @@ views:
     order:
       - Value
     x: note.Category
-    y: note.Value
     percentage: true
     labels: true

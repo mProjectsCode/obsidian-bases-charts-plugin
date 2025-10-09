@@ -13,10 +13,9 @@ views:
       property: formula.year
       direction: ASC
     order:
-      - Low
-      - High
+      - Open
+      - Close
     x: note.Date
-    y: note.Close
     multi-chart-mode: Separate by group
     sync-y-axes: true
     min-y-override: "0"

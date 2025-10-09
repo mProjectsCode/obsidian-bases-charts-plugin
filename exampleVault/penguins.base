@@ -13,7 +13,4 @@ views:
       - culmen_depth_mm
       - flipper_length_mm
     x: note.culmen_length_mm
-    y: note.culmen_depth_mm
     multi-chart-mode: Separate by property
-  - type: table
-    name: View
