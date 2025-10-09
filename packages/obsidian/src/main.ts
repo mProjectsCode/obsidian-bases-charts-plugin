@@ -2,7 +2,7 @@ import { Plugin } from 'obsidian';
 import { BAR_CHART_VIEW_TYPE, ChartView, LINE_CHART_VIEW_TYPE, SCATTER_CHART_VIEW_TYPE } from 'packages/obsidian/src/ChartView';
 import 'packages/obsidian/src/styles.css';
 
-export default class MyPlugin extends Plugin {
+export default class BasesChartsPlugin extends Plugin {
 	async onload(): Promise<void> {
 		this.registerBasesView(SCATTER_CHART_VIEW_TYPE, {
 			name: 'Scatter Chart',
