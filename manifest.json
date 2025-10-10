@@ -1,7 +1,7 @@
 {
 	"id": "bases-charts",
 	"name": "Bases Charts",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"minAppVersion": "1.10.0",
 	"description": "Bases views for scatter, line, and bar charts.",
 	"author": "Moritz Jung",
