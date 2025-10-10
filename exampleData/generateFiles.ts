@@ -1,20 +1,11 @@
 import * as fs from 'node:fs/promises';
+import neatCsv from 'neat-csv';
 
 async function generateMarkdownFiles(datasetName: string) {
 	const csv = Bun.file(`exampleData/${datasetName}.csv`);
 	const text = await csv.text();
 
-	const [headerLine, ...lines] = text.split('\n').filter(Boolean);
-	const properties = headerLine.split(',').map(prop => prop.trim());
-
-	const data = lines.map(line => {
-		const values = line.split(',').map(value => value.trim());
-		const entry: Record<string, string> = {};
-		properties.forEach((prop, idx) => {
-			entry[prop] = values[idx] ?? '';
-		});
-		return entry;
-	});
+	const data = await neatCsv(text);
 
 	console.log(`Found ${data.length} ${datasetName} entries`);
 
@@ -42,5 +33,6 @@ async function generateMarkdownFiles(datasetName: string) {
 
 generateMarkdownFiles('aapl');
 generateMarkdownFiles('penguins');
+generateMarkdownFiles('movies');
 
 export {};

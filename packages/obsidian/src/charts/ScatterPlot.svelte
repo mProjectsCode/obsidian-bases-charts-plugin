@@ -30,6 +30,7 @@
 			<Pointer data={dataPoints} x="x" y="y" maxDistance={50} onupdate={setHoveredData}>
 				{#snippet children({ data })}
 					<Text data={data} x="x" y="y" fill="var(--bases-charts-text)" text={d => toCompactString(d.y)} lineAnchor="bottom" dy={-10} />
+					<Text data={data} x="x" y="y" fill="var(--bases-charts-text)" text={d => toCompactString(d.label)} lineAnchor="bottom" dy={-25} />
 					<Dot data={data} x="x" y="y" fill={groupFn} stroke="var(--bases-charts-text)" />
 				{/snippet}
 			</Pointer>

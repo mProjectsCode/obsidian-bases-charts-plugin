@@ -74,15 +74,12 @@
 		gap: var(--size-4-4);
 		width: 100%;
 		height: 100%;
-		padding: var(--size-4-4);
 	}
 
 	.bases-charts-plot-legend {
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--size-4-3);
-		padding-inline: var(--size-4-4);
-		padding-top: var(--size-4-4);
 	}
 
 	.bases-charts-plot-legend-item {

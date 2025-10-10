@@ -1,0 +1,24 @@
+formulas:
+  One: "1"
+  Release Year: date(year + "-01-01")
+views:
+  - type: chart-scatter
+    name: Rlease year vs movie length
+    filters:
+      and:
+        - file.folder == "movies"
+    order:
+      - duration
+    x: formula.Release Year
+    min-y-override: ""
+    max-y-override: ""
+    label-property: note.original_title
+  - type: chart-bar
+    name: Release year
+    filters:
+      and:
+        - file.folder == "movies"
+    order:
+      - formula.One
+    x: formula.Release Year
+    show-labels: false

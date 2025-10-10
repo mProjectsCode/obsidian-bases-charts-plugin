@@ -19,6 +19,7 @@ export type ProcessedData = {
 	 */
 	chartIndex: number;
 	file: string;
+	label?: string;
 };
 
 export abstract class AbstractDataWrapper<ChartId, GroupId> {

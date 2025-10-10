@@ -23,6 +23,7 @@ export const CHART_SETTINGS = {
 	SYNC_Y_AXES: 'sync-y-axes',
 	MIN_Y_OVERRIDE: 'min-y-override',
 	MAX_Y_OVERRIDE: 'max-y-override',
+	LABEL_PROP: 'label-property',
 } as const;
 
 export enum MultiChartMode {
@@ -66,6 +67,8 @@ export class ChartView extends BasesView {
 	}
 
 	onload(): void {
+		this.scrollEl.addClass('bases-chart-view');
+
 		if (this.type === SCATTER_CHART_VIEW_TYPE) {
 			this.svelteComponent = mount(ScatterPlot, {
 				target: this.scrollEl,
@@ -117,7 +120,6 @@ export class ChartView extends BasesView {
 
 		const data: ProcessedData[] = [];
 		const groupBySet = this.data.groupedData.map(g => g.key?.toString()).filter(k => k != null);
-		groupBySet.sort();
 
 		for (const group of this.data?.groupedData ?? []) {
 			const groupKey = group.key?.toString();
@@ -145,6 +147,7 @@ export class ChartView extends BasesView {
 		try {
 			const x = entry.getValue(xField);
 			const xValue = parseValueAsX(x);
+			const labelProp = this.config.getAsPropertyId(CHART_SETTINGS.LABEL_PROP);
 
 			if (xValue === null) {
 				return [];
@@ -154,6 +157,7 @@ export class ChartView extends BasesView {
 			let i = 0;
 			for (const prop of propertyOrder) {
 				const yValue = parseValueAsNumber(entry.getValue(prop));
+				const label = labelProp ? entry.getValue(labelProp)?.toString() : undefined;
 
 				if (xValue !== null && yValue !== null) {
 					result.push({
@@ -162,6 +166,7 @@ export class ChartView extends BasesView {
 						groupIndex: mode === MultiChartMode.GROUP ? i : groupIndex,
 						chartIndex: mode === MultiChartMode.GROUP ? groupIndex : i,
 						file: entry.file.path,
+						label: label,
 					});
 				}
 
@@ -257,7 +262,15 @@ export class ChartView extends BasesView {
 	}
 
 	static scatterViewOptions(): ViewOption[] {
-		return [...ChartView.commonViewOptions()];
+		return [
+			...ChartView.commonViewOptions(),
+			{
+				displayName: 'Label property',
+				type: 'property',
+				key: CHART_SETTINGS.LABEL_PROP,
+				placeholder: 'Property',
+			},
+		];
 	}
 
 	static lineViewOptions(): ViewOption[] {
