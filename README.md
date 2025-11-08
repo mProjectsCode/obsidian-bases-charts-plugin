@@ -4,7 +4,7 @@ This plugin for Obsidian adds three new bases views: Scatter Charts, Line Charts
 
 ## Usage
 
-First you need a [Base](https://help.obsidian.md/bases), then from there you can (with the plugin installed and enabled) create thee new bases views: Scatter Charts, Line Charts, and Bar Charts.
+First you need a [Base](https://help.obsidian.md/bases), then from there you can (with the plugin installed and enabled) create three new bases views: Scatter Charts, Line Charts, and Bar Charts.
 Next you need to select the property or formula used for the X axis, in the view settings.
 On the X axis, [`Number`, `Date`, and `String`](https://help.obsidian.md/bases/functions) are supported.
 Then you can select which properties to display on the Y Axis using the Base's `Properties` menu (top right).
