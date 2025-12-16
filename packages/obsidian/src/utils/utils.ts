@@ -2,7 +2,7 @@ import type { Value } from 'obsidian';
 import { DateValue, NumberValue, StringValue } from 'obsidian';
 import type { AbstractDataWrapper, ProcessedData } from 'packages/obsidian/src/ChartData';
 
-export function toCompactString(datum: number | string | symbol | boolean | Date | null | undefined): string {
+export function toCompactString(datum: object | number | string | symbol | boolean | Date | null | undefined): string {
 	if (datum == null) {
 		return '';
 	}
@@ -17,6 +17,9 @@ export function toCompactString(datum: number | string | symbol | boolean | Date
 	}
 	if (datum instanceof Date) {
 		return datum.toLocaleDateString();
+	}
+	if (typeof datum === 'object') {
+		return 'object';
 	}
 	return datum;
 }

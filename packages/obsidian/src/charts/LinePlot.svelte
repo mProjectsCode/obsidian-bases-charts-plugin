@@ -21,7 +21,7 @@
 			height={height}
 			class="bases-charts-plot"
 		>
-			<AxisX fill="var(--bases-charts-text)" stroke="var(--bases-charts-text)" opacity={1} />
+			<AxisX fill="var(--bases-charts-text)" stroke="var(--bases-charts-text)" opacity={1} removeDuplicateTicks />
 			<AxisY fill="var(--bases-charts-text)" stroke="var(--bases-charts-text)" opacity={1} />
 			<GridX stroke="var(--bases-charts-grid)" strokeOpacity={1} />
 			<GridY stroke="var(--bases-charts-grid)" strokeOpacity={1} />

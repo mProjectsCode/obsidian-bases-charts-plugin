@@ -109,7 +109,10 @@ export class ChartView extends BasesView {
 		const propertyOrder = this.config.getOrder();
 
 		if (mode !== MultiChartMode.GROUP && mode !== MultiChartMode.PROPERTY) {
-			// eslint-disable-next-line @typescript-eslint/no-base-to-string
+			/* eslint-disable-next-line @typescript-eslint/no-base-to-string --
+			 * this is a safety check to catch when the saved data does not match the type definitions
+			 * (mostly because the unknown type if the config.get method)
+			 */
 			console.warn(`Invalid multi chart mode: ${mode}`);
 			return emptyDataWrapper(this);
 		}

@@ -3,7 +3,7 @@ import { BAR_CHART_VIEW_TYPE, ChartView, LINE_CHART_VIEW_TYPE, SCATTER_CHART_VIE
 import 'packages/obsidian/src/styles.css';
 
 export default class BasesChartsPlugin extends Plugin {
-	async onload(): Promise<void> {
+	onload(): void {
 		this.registerBasesView(SCATTER_CHART_VIEW_TYPE, {
 			name: 'Scatter Chart',
 			icon: 'lucide-chart-scatter',

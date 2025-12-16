@@ -2,7 +2,10 @@ import type { BasesPropertyId } from 'obsidian';
 import type { ChartView, YDomainOverrides } from 'packages/obsidian/src/ChartView';
 import { OBSIDIAN_DEFAULT_SINGLE_COLOR, OBSIDIAN_COLOR_PALETTE } from 'packages/obsidian/src/utils/utils';
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+/* eslint-disable-next-line @typescript-eslint/consistent-type-definitions --
+ * We disable this rule to prevent the auto fix from turning this into an interface,
+ * which messes with the types for svelte plot, bc in TS interface != type
+ */
 export type ProcessedData = {
 	x: number | Date | string;
 	y: number;
