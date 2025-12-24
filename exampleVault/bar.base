@@ -12,3 +12,15 @@ views:
     x: note.Category
     percentage: true
     labels: true
+  - type: table
+    name: Table
+    order:
+      - file.name
+      - Adj Close
+      - avg_vote
+      - body_mass_g
+      - Category
+      - Close
+      - culmen_depth_mm
+      - culmen_length_mm
+      - director
