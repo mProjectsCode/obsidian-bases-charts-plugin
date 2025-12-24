@@ -4,6 +4,19 @@ properties:
   formula.year:
     displayName: Year
 views:
+  - type: table
+    name: Table
+    order:
+      - file.name
+      - file.backlinks
+      - file.basename
+      - file.ctime
+      - file.embeds
+      - file.ext
+      - avg_vote
+      - Adj Close
+      - Close
+      - duration
   - type: chart-line
     name: View
     filters:

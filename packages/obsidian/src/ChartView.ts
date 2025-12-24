@@ -97,6 +97,7 @@ export class ChartView extends BasesView {
 		if (this.svelteComponent) {
 			void unmount(this.svelteComponent);
 		}
+		this.scrollEl.removeClass('bases-chart-view');
 	}
 
 	onDataUpdated(): void {
