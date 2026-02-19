@@ -13,6 +13,7 @@ views:
     min-y-override: ""
     max-y-override: ""
     label-property: note.original_title
+    cumulative-y: false
   - type: chart-bar
     name: Release year
     filters:
@@ -22,3 +23,17 @@ views:
       - formula.One
     x: formula.Release Year
     show-labels: false
+    cumulative-y: false
+  - type: chart-line
+    name: Cumulative length vs Release year
+    order:
+      - votes
+      - duration
+      - avg_vote
+    sort:
+      - property: formula.Release Year
+        direction: ASC
+    x: formula.Release Year
+    cumulative-y: true
+    sync-y-axes: false
+    multi-chart-mode: Separate by property
