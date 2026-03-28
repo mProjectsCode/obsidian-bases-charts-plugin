@@ -44,6 +44,10 @@ Currently only via BRAT.
 
 [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/)
 
+## Acknowledgements
+
+This project is a fork of [obsidian-bases-charts-plugin](https://github.com/mProjectsCode/obsidian-bases-charts-plugin) by [mProjectsCode](https://github.com/mProjectsCode). It is actively maintained with ongoing bug fixes and new features.
+
 ## Contributions
 
 Thank you for wanting to contribute to this project.

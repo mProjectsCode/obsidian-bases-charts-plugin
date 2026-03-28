@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Line, Plot, GridX, GridY, AxisY, AxisX, Pointer, Text, Dot, RuleX } from 'svelteplot';
-	import { ChartView } from '../ChartView';
+	import { ChartView, CHART_SETTINGS, AggregateMode } from '../ChartView';
 	import { toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
 
@@ -14,10 +14,14 @@
 <PlotGrid view={view}>
 	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height, setHoveredData })}
 		{@const dataPoints = data.getFlat(chartIndex, true)}
+		{@const aggregateMode = (view.config.get(CHART_SETTINGS.AGGREGATE) as AggregateMode | undefined) ?? AggregateMode.NONE}
+		{@const yLabel = aggregateMode !== AggregateMode.NONE
+			? `↑ ${data.getChartName(chartIndex)} (${aggregateMode})`
+			: `↑ ${data.getChartName(chartIndex)}`}
 		<Plot
 			grid
 			x={{ label: xName }}
-			y={{ label: `↑ ${data.getChartName(chartIndex)}`, domain: data.getYDomainForChart(chartIndex) }}
+			y={{ label: yLabel, domain: data.getYDomainForChart(chartIndex) }}
 			height={height}
 			class="bases-charts-plot"
 		>

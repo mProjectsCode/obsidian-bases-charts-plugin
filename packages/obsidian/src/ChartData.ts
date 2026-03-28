@@ -21,7 +21,8 @@ export type ProcessedData = {
 	 * In property separated mode, this is the property id.
 	 */
 	chartIndex: number;
-	file: string;
+	files: string[];
+	fileValues: number[];
 	label?: string;
 };
 
@@ -225,9 +226,17 @@ export function emptyDataWrapper(view: ChartView): DataWrapper {
 
 export function sortDataByGroup(data: ProcessedData[]): ProcessedData[] {
 	return data.sort((a, b) => {
-		if (a.groupIndex != null && b.groupIndex != null) {
-			return a.groupIndex - b.groupIndex;
+		if (a.groupIndex !== b.groupIndex) {
+			return (a.groupIndex ?? 0) - (b.groupIndex ?? 0);
 		}
-		return 0;
+
+		// Within the same group, sort by x
+		if (typeof a.x === 'number' && typeof b.x === 'number') {
+			return a.x - b.x;
+		}
+		if (a.x instanceof Date && b.x instanceof Date) {
+			return a.x.getTime() - b.x.getTime();
+		}
+		return String(a.x).localeCompare(String(b.x));
 	});
 }

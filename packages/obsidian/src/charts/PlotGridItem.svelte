@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { ChartProps, FullChartProps } from '../utils/utils';
-	import type { ChartView } from '../ChartView';
+	import { type ChartView, CHART_SETTINGS, AggregateMode } from '../ChartView';
 	import type { ProcessedData } from '../ChartData';
+	import { Menu } from 'obsidian';
 
 	interface Props {
 		view: ChartView;
@@ -27,9 +28,34 @@
 			return;
 		}
 
+		const { files, fileValues, y } = hoveredData[0];
 		const newTab = e.ctrlKey || e.metaKey;
-		const filePath = hoveredData[0].file;
-		view.openFile(filePath, newTab);
+		const columnName = chartProps.data.getChartName(hoveredData[0].chartIndex);
+
+		if (files.length === 1) {
+			view.openFile(files[0], newTab);
+		} else if (files.length > 1) {
+			const menu = new Menu();
+			const aggregateMode = (view.config.get(CHART_SETTINGS.AGGREGATE) as AggregateMode | undefined) ?? AggregateMode.NONE;
+			menu.addItem(item => {
+				item.setTitle(`${columnName} (${aggregateMode}): ${y}`)
+					.setIsLabel(true);
+			});
+			menu.addSeparator();
+			for (let i = 0; i < files.length; i++) {
+				const filePath = files[i];
+				const name = (filePath.split('/').pop() ?? filePath).replace(/\.[^.]+$/, '');
+				const value = fileValues[i];
+				menu.addItem(item => {
+					item.setTitle(`${name}  ·  ${columnName}: ${value}`)
+						.setIcon('file-text')
+						.onClick(() => {
+							view.openFile(filePath, newTab);
+						});
+				});
+			}
+			menu.showAtMouseEvent(e);
+		}
 	}
 </script>
 

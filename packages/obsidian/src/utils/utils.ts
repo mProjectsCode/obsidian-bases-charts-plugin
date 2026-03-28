@@ -75,8 +75,7 @@ export function parseValueAsX(value: Value | null): number | Date | string | nul
 		return value.data;
 	}
 	if (value instanceof StringValue) {
-		const parsed = parseFloat(value.data);
-		return isNaN(parsed) ? value.data : parsed;
+		return value.data;
 	}
 	if (value instanceof DateValue) {
 		return new Date(value.toString());

@@ -24,11 +24,21 @@ export const CHART_SETTINGS = {
 	MIN_Y_OVERRIDE: 'min-y-override',
 	MAX_Y_OVERRIDE: 'max-y-override',
 	LABEL_PROP: 'label-property',
+	AGGREGATE: 'aggregate',
 } as const;
 
 export enum MultiChartMode {
 	GROUP = 'Separate by group',
 	PROPERTY = 'Separate by property',
+}
+
+export enum AggregateMode {
+	NONE = 'None',
+	AVERAGE = 'Average',
+	SUM = 'Sum',
+	COUNT = 'Count',
+	MIN = 'Min',
+	MAX = 'Max',
 }
 
 export interface YDomainOverrides {
@@ -140,10 +150,12 @@ export class ChartView extends BasesView {
 			}
 		}
 
+		const aggregatedData = this.type === LINE_CHART_VIEW_TYPE ? aggregateData(data, this.config.get(CHART_SETTINGS.AGGREGATE) as AggregateMode | undefined) : data;
+
 		if (mode === MultiChartMode.GROUP) {
-			return new GroupSeparatedData(this, data, groupBySet);
+			return new GroupSeparatedData(this, aggregatedData, groupBySet);
 		} else {
-			return new PropertySeparatedData(this, data, groupBySet);
+			return new PropertySeparatedData(this, aggregatedData, groupBySet);
 		}
 	}
 
@@ -169,7 +181,8 @@ export class ChartView extends BasesView {
 						y: yValue,
 						groupIndex: mode === MultiChartMode.GROUP ? i : groupIndex,
 						chartIndex: mode === MultiChartMode.GROUP ? groupIndex : i,
-						file: entry.file.path,
+						files: [entry.file.path],
+						fileValues: [yValue],
 						label: label,
 					});
 				}
@@ -278,7 +291,23 @@ export class ChartView extends BasesView {
 	}
 
 	static lineViewOptions(): ViewOption[] {
-		return [...ChartView.commonViewOptions()];
+		return [
+			...ChartView.commonViewOptions(),
+			{
+				displayName: 'Aggregate',
+				type: 'dropdown',
+				key: CHART_SETTINGS.AGGREGATE,
+				options: {
+					[AggregateMode.NONE]: AggregateMode.NONE,
+					[AggregateMode.AVERAGE]: AggregateMode.AVERAGE,
+					[AggregateMode.SUM]: AggregateMode.SUM,
+					[AggregateMode.COUNT]: AggregateMode.COUNT,
+					[AggregateMode.MIN]: AggregateMode.MIN,
+					[AggregateMode.MAX]: AggregateMode.MAX,
+				},
+				default: AggregateMode.NONE,
+			},
+		];
 	}
 
 	static barViewOptions(): ViewOption[] {
@@ -298,4 +327,60 @@ export class ChartView extends BasesView {
 			},
 		];
 	}
+}
+
+function aggregateData(data: ProcessedData[], mode: AggregateMode | undefined): ProcessedData[] {
+	if (!mode || mode === AggregateMode.NONE) {
+		return data;
+	}
+
+	// Group by x + chartIndex + groupIndex
+	const buckets = new Map<string, ProcessedData[]>();
+	for (const d of data) {
+		const key = `${String(d.x)}|${d.chartIndex}|${d.groupIndex}`;
+		let bucket = buckets.get(key);
+		if (!bucket) {
+			bucket = [];
+			buckets.set(key, bucket);
+		}
+		bucket.push(d);
+	}
+
+	const result: ProcessedData[] = [];
+	for (const bucket of buckets.values()) {
+		const first = bucket[0];
+		let y: number;
+
+		switch (mode) {
+			case AggregateMode.SUM:
+				y = bucket.reduce((sum, d) => sum + d.y, 0);
+				break;
+			case AggregateMode.AVERAGE:
+				y = bucket.reduce((sum, d) => sum + d.y, 0) / bucket.length;
+				break;
+			case AggregateMode.COUNT:
+				y = bucket.length;
+				break;
+			case AggregateMode.MIN:
+				y = Math.min(...bucket.map(d => d.y));
+				break;
+			case AggregateMode.MAX:
+				y = Math.max(...bucket.map(d => d.y));
+				break;
+			default:
+				y = first.y;
+		}
+
+		result.push({
+			x: first.x,
+			y: y,
+			groupIndex: first.groupIndex,
+			chartIndex: first.chartIndex,
+			files: bucket.flatMap(d => d.files),
+			fileValues: bucket.flatMap(d => d.fileValues),
+			label: first.label,
+		});
+	}
+
+	return result;
 }
