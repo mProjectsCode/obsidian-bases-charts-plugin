@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AxisX, AxisY, BarY, GridY, Plot, Text } from 'svelteplot';
-	import { CHART_SETTINGS, ChartView } from '../ChartView';
+	import { CHART_SETTINGS, ChartView, AggregateMode } from '../ChartView';
 	import { onMount } from 'svelte';
 	import { toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
@@ -30,9 +30,13 @@
 
 <PlotGrid view={view}>
 	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height })}
+		{@const aggregateMode = (view.config.get(CHART_SETTINGS.AGGREGATE) as AggregateMode | undefined) ?? AggregateMode.NONE}
+		{@const yLabel = aggregateMode !== AggregateMode.NONE
+			? `↑ ${data.getChartName(chartIndex)} (${aggregateMode})`
+			: `↑ ${data.getChartName(chartIndex)}`}
 		<Plot
 			x={{ label: xName, type: 'band' }}
-			y={{ label: `↑ ${data.getChartName(chartIndex)}`, tickFormat: show_percentages ? d => `${String(d)}%` : d => toCompactString(d) }}
+			y={{ label: yLabel, tickFormat: show_percentages ? d => `${String(d)}%` : d => toCompactString(d) }}
 			height={height}
 			class="bases-charts-plot"
 		>

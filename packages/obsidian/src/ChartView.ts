@@ -150,7 +150,9 @@ export class ChartView extends BasesView {
 			}
 		}
 
-		const aggregatedData = this.type === LINE_CHART_VIEW_TYPE ? aggregateData(data, this.config.get(CHART_SETTINGS.AGGREGATE) as AggregateMode | undefined) : data;
+		const aggregatedData = this.type === LINE_CHART_VIEW_TYPE || this.type === BAR_CHART_VIEW_TYPE
+			? aggregateData(data, this.config.get(CHART_SETTINGS.AGGREGATE) as AggregateMode | undefined)
+			: data;
 
 		if (mode === MultiChartMode.GROUP) {
 			return new GroupSeparatedData(this, aggregatedData, groupBySet);
@@ -275,6 +277,20 @@ export class ChartView extends BasesView {
 				placeholder: 'Leave empty to disable',
 				default: '',
 			},
+			{
+				displayName: 'Aggregate',
+				type: 'dropdown',
+				key: CHART_SETTINGS.AGGREGATE,
+				options: {
+					[AggregateMode.NONE]: AggregateMode.NONE,
+					[AggregateMode.AVERAGE]: AggregateMode.AVERAGE,
+					[AggregateMode.SUM]: AggregateMode.SUM,
+					[AggregateMode.COUNT]: AggregateMode.COUNT,
+					[AggregateMode.MIN]: AggregateMode.MIN,
+					[AggregateMode.MAX]: AggregateMode.MAX,
+				},
+				default: AggregateMode.NONE,
+			},
 		];
 	}
 
@@ -291,23 +307,7 @@ export class ChartView extends BasesView {
 	}
 
 	static lineViewOptions(): ViewOption[] {
-		return [
-			...ChartView.commonViewOptions(),
-			{
-				displayName: 'Aggregate',
-				type: 'dropdown',
-				key: CHART_SETTINGS.AGGREGATE,
-				options: {
-					[AggregateMode.NONE]: AggregateMode.NONE,
-					[AggregateMode.AVERAGE]: AggregateMode.AVERAGE,
-					[AggregateMode.SUM]: AggregateMode.SUM,
-					[AggregateMode.COUNT]: AggregateMode.COUNT,
-					[AggregateMode.MIN]: AggregateMode.MIN,
-					[AggregateMode.MAX]: AggregateMode.MAX,
-				},
-				default: AggregateMode.NONE,
-			},
-		];
+		return [...ChartView.commonViewOptions()];
 	}
 
 	static barViewOptions(): ViewOption[] {
