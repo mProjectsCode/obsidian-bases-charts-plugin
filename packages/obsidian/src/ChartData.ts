@@ -225,9 +225,22 @@ export function emptyDataWrapper(view: ChartView): DataWrapper {
 
 export function sortDataByGroup(data: ProcessedData[]): ProcessedData[] {
 	return data.sort((a, b) => {
-		if (a.groupIndex != null && b.groupIndex != null) {
+		if (a.groupIndex !== b.groupIndex) {
 			return a.groupIndex - b.groupIndex;
 		}
-		return 0;
+		return compareX(a.x, b.x);
 	});
+}
+
+function compareX(a: number | Date | string, b: number | Date | string): number {
+	if (a instanceof Date && b instanceof Date) {
+		return a.getTime() - b.getTime();
+	}
+	if (typeof a === 'number' && typeof b === 'number') {
+		return a - b;
+	}
+	if (typeof a === 'string' && typeof b === 'string') {
+		return a.localeCompare(b);
+	}
+	return 0;
 }
