@@ -15,3 +15,18 @@ views:
     x: note.culmen_length_mm
     multi-chart-mode: Separate by property
     sync-y-axes: false
+  - type: table
+    name: Table
+    filters:
+      and:
+        - file.folder == "penguins"
+    order:
+      - file.name
+      - species
+      - sex
+      - island
+      - culmen_depth_mm
+      - culmen_length_mm
+      - flipper_length_mm
+    columnSize:
+      note.flipper_length_mm: 195
