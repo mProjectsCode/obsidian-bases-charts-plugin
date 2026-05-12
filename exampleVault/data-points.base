@@ -1,0 +1,9 @@
+views:
+  - type: chart-line
+    name: line-chart
+    filters:
+      and:
+        - type == "data-point"
+    order:
+      - valY
+    x: note.Date
