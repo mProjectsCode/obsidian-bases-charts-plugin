@@ -21,6 +21,7 @@ export const CHART_SETTINGS = {
 	SHOW_LABELS: 'show-labels',
 	MULTI_CHART: 'multi-chart-mode',
 	SYNC_Y_AXES: 'sync-y-axes',
+	CUMULATIVE_Y: 'cumulative-y',
 	MIN_Y_OVERRIDE: 'min-y-override',
 	MAX_Y_OVERRIDE: 'max-y-override',
 	LABEL_PROP: 'label-property',
@@ -124,7 +125,8 @@ export class ChartView extends BasesView {
 
 		const data: ProcessedData[] = [];
 		const groupBySet = this.data.groupedData.map(g => g.key?.toString()).filter(k => k != null);
-
+		const cumulativeY = Boolean(this.config.get(CHART_SETTINGS.CUMULATIVE_Y));
+		console.log(propertyOrder.length)
 		for (const group of this.data?.groupedData ?? []) {
 			const groupKey = group.key?.toString();
 			let groupIndex: number;
@@ -133,9 +135,25 @@ export class ChartView extends BasesView {
 			} else {
 				groupIndex = groupBySet.indexOf(groupKey);
 			}
-
+			const numProperties = propertyOrder.length
+			let previous_y = new Array(numProperties).fill(0);
 			for (const entry of group.entries) {
+				
 				const processedEntry = this.processEntry(entry, xField, propertyOrder, groupIndex, mode);
+				// Iterate over each data point in processedEntry, cumulate by group
+				for (const dataPoint of processedEntry) { 
+					if (cumulativeY) {
+						let propIndex;
+						if (mode == MultiChartMode.GROUP) {
+							propIndex = dataPoint.groupIndex
+						} else {
+							propIndex = dataPoint.chartIndex
+						}
+						dataPoint.y += previous_y[propIndex]; 
+						previous_y[propIndex] = dataPoint.y;
+					}
+				}
+
 				data.push(...processedEntry);
 			}
 		}
@@ -152,7 +170,7 @@ export class ChartView extends BasesView {
 			const x = entry.getValue(xField);
 			const xValue = parseValueAsX(x);
 			const labelProp = this.config.getAsPropertyId(CHART_SETTINGS.LABEL_PROP);
-
+		
 			if (xValue === null) {
 				return [];
 			}
@@ -246,6 +264,12 @@ export class ChartView extends BasesView {
 				displayName: 'Sync Y axes',
 				type: 'toggle',
 				key: CHART_SETTINGS.SYNC_Y_AXES,
+				default: false,
+			},
+			{
+				displayName: 'Cumulative Y',
+				type: 'toggle',
+				key: CHART_SETTINGS.CUMULATIVE_Y,
 				default: false,
 			},
 			{
