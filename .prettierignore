@@ -2,3 +2,5 @@
 node_modules
 exampleVault
 dist
+artifacts
+bun.lock

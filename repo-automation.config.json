@@ -1,0 +1,6 @@
+{
+	"devBranch": "master",
+	"releaseBranch": "release",
+	"github": "https://github.com/mProjectsCode/obsidian-bases-charts-plugin",
+	"preconditions": ["bun run verify"]
+}

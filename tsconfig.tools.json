@@ -1,0 +1,5 @@
+{
+	"extends": "./tsconfig.eslint.json",
+	"include": ["*.mts", "*.ts", "scripts/**/*.ts", "exampleData/**/*.ts"],
+	"exclude": ["node_modules", "dist", "exampleVault", "vendor"]
+}
