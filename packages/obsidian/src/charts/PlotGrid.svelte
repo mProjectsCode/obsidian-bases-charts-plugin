@@ -1,9 +1,12 @@
 <script lang="ts">
-	import { onMount, type Snippet } from 'svelte';
-	import { CHART_SETTINGS, type ChartView } from '../ChartView';
-	import { OBSIDIAN_DEFAULT_SINGLE_COLOR, type FullChartProps } from '../utils/utils';
-	import PlotGridItem from './PlotGridItem.svelte';
+	import type { Snippet } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { DataWrapper } from '../ChartData';
+	import type { ChartView } from '../ChartView';
+	import { CHART_SETTINGS } from '../ChartView';
+	import type { FullChartProps } from '../utils/utils';
+	import { OBSIDIAN_DEFAULT_SINGLE_COLOR } from '../utils/utils';
+	import PlotGridItem from './PlotGridItem.svelte';
 
 	interface Props {
 		view: ChartView;

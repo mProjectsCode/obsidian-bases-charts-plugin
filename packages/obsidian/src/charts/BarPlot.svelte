@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { AxisX, AxisY, BarY, GridY, Plot, Text } from 'svelteplot';
-	import { CHART_SETTINGS, ChartView } from '../ChartView';
+	import type { ProcessedData } from '../ChartData';
+	import type { ChartView } from '../ChartView';
+	import { CHART_SETTINGS } from '../ChartView';
 	import { onMount } from 'svelte';
+	import type { FullChartProps } from '../utils/utils';
 	import { toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
 
@@ -29,7 +32,7 @@
 </script>
 
 <PlotGrid view={view}>
-	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height })}
+	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height }: FullChartProps<string, string>)}
 		<Plot
 			x={{ label: xName, type: 'band' }}
 			y={{ label: `↑ ${data.getChartName(chartIndex)}`, tickFormat: show_percentages ? d => `${String(d)}%` : d => toCompactString(d) }}
@@ -47,7 +50,7 @@
 					x="x"
 					y="y"
 					fill="var(--bases-charts-text)"
-					text={d => (show_percentages ? `${d.y.toFixed(1)}%` : toCompactString(d.y))}
+					text={(d: ProcessedData) => (show_percentages ? `${d.y.toFixed(1)}%` : toCompactString(d.y))}
 					lineAnchor="bottom"
 					dy={-5}
 				/>

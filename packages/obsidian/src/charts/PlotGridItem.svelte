@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { ChartProps, FullChartProps } from '../utils/utils';
-	import type { ChartView } from '../ChartView';
 	import type { ProcessedData } from '../ChartData';
+	import type { ChartView } from '../ChartView';
+	import type { ChartProps, FullChartProps } from '../utils/utils';
 
 	interface Props {
 		view: ChartView;

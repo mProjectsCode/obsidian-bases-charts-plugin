@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { AxisX, AxisY, Dot, GridX, GridY, Plot, Pointer, Text } from 'svelteplot';
-	import { ChartView } from '../ChartView';
+	import type { ChartView } from '../ChartView';
+	import '../ChartView';
+	import type { FullChartProps } from '../utils/utils';
 	import { toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
 
@@ -12,7 +14,7 @@
 </script>
 
 <PlotGrid view={view}>
-	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height, setHoveredData })}
+	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height, setHoveredData }: FullChartProps<string, string>)}
 		{@const dataPoints = data.getFlat(chartIndex)}
 		<Plot
 			grid

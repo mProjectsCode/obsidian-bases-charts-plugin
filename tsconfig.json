@@ -21,9 +21,7 @@
 		"types": ["bun", "vite/client"],
 		"paths": {
 			"packages/*": ["./packages/*"],
-			"src/*": ["./src/*"],
-			"build/*": ["./automation/build/*"],
-			"utils/*": ["./automation/utils/*"]
+			"src/*": ["./src/*"]
 		}
 	},
 	"include": ["packages/obsidian/src/**/*.ts", "packages/obsidian/src/**/*.svelte", "tests/**/*.ts", "exampleData/**/*.ts", "svelte.config.js"]
