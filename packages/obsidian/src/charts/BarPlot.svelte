@@ -35,7 +35,7 @@
 	{#snippet chartSnippet({ data, chartIndex, xName, groupFn, height }: FullChartProps<string, string>)}
 		<Plot
 			x={{ label: xName, type: 'band' }}
-			y={{ label: `↑ ${data.getChartName(chartIndex)}`, tickFormat: show_percentages ? d => `${String(d)}%` : d => toCompactString(d) }}
+			y={{ label: `↑ ${data.getChartName(chartIndex)}`, tickFormat: show_percentages ? d => `${d as number}%` : d => toCompactString(d) }}
 			height={height}
 			class="bases-charts-plot"
 		>

@@ -114,7 +114,7 @@ export class ChartView extends BasesView {
 			 * this is a safety check to catch when the saved data does not match the type definitions
 			 * (mostly because the unknown type if the config.get method)
 			 */
-			console.warn(`Invalid multi chart mode: ${mode}`);
+			console.warn(`Invalid multi chart mode: ${String(mode)}`);
 			return emptyDataWrapper(this);
 		}
 

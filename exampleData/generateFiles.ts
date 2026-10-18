@@ -31,8 +31,8 @@ async function generateMarkdownFiles(datasetName: string) {
 	console.log(`Created ${data.length} ${datasetName} notes`);
 }
 
-generateMarkdownFiles('aapl');
-generateMarkdownFiles('penguins');
-generateMarkdownFiles('movies');
+void generateMarkdownFiles('aapl').catch(console.error);
+void generateMarkdownFiles('penguins').catch(console.error);
+void generateMarkdownFiles('movies').catch(console.error);
 
 export {};

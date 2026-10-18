@@ -15,7 +15,7 @@
 
 	let { view, chartSnippet }: Props = $props();
 
-	let data: DataWrapper | null = $state(null) as DataWrapper | null;
+	let data: DataWrapper | null = $state<DataWrapper | null>(null);
 	let xName: string = $state('');
 	let isGrouped: boolean = $derived(data?.hasMultipleGroups() ?? false);
 	let groupFn = $derived(data?.getChartGroupIdentifier() ?? OBSIDIAN_DEFAULT_SINGLE_COLOR);
@@ -39,7 +39,7 @@
 
 <div class="bases-charts-plot-legend">
 	{#if data}
-		{#each data.getGroupIdentifiers() as _, groupIndex}
+		{#each data.getGroupIdentifiers() as _, groupIndex (groupIndex)}
 			<div class="bases-charts-plot-legend-item">
 				<div class="bases-charts-plot-legend-color" style="--color: {data.getColorFromGroupIndex(groupIndex)}"></div>
 				<span class="bases-charts-plot-legend-label">{data.getGroupName(groupIndex)}</span>
@@ -50,7 +50,7 @@
 
 <div class="bases-charts-plot-grid">
 	{#if data}
-		{#each data.getChartIdentifiers() as _, chartIndex}
+		{#each data.getChartIdentifiers() as _, chartIndex (chartIndex)}
 			<PlotGridItem
 				view={view}
 				chartSnippet={chartSnippet}

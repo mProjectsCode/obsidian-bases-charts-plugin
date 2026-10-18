@@ -29,7 +29,7 @@
 
 		const newTab = e.ctrlKey || e.metaKey;
 		const filePath = hoveredData[0].file;
-		view.openFile(filePath, newTab);
+		void view.openFile(filePath, newTab).catch(console.error);
 	}
 </script>
 
