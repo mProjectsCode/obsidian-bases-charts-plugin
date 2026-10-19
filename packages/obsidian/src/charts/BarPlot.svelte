@@ -1,9 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { AxisX, AxisY, BarY, GridY, Plot, Text } from 'svelteplot';
 	import type { ProcessedData } from '../ChartData';
 	import type { ChartView } from '../ChartView';
 	import { CHART_SETTINGS } from '../ChartView';
-	import { onMount } from 'svelte';
 	import type { FullChartProps } from '../utils/utils';
 	import { toCompactString } from '../utils/utils';
 	import PlotGrid from './PlotGrid.svelte';
