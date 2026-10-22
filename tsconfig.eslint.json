@@ -22,8 +22,7 @@
 		"*.js",
 		"packages/**/*.d.ts",
 		"packages/*/tests/**/*",
-		"packages/*/test/**/*",
-		"exampleData/**/*.ts"
+		"packages/*/test/**/*"
 	],
 	"exclude": ["node_modules", "dist", "exampleVault", "vendor", "packages/lemons-search", "packages/lemons-search-ui", "**/dist/**", "**/pkg/**"]
 }

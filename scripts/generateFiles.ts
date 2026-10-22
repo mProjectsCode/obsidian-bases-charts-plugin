@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import neatCsv from 'neat-csv';
 
 async function generateMarkdownFiles(datasetName: string) {
-	const csv = Bun.file(`exampleData/${datasetName}.csv`);
+	const csv = Bun.file(`scripts/${datasetName}.csv`);
 	const text = await csv.text();
 
 	const data = await neatCsv(text);

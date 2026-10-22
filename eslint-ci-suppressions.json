@@ -1,0 +1,7 @@
+{
+	"packages/obsidian/src/ChartView.ts": {
+		"@typescript-eslint/no-base-to-string": {
+			"count": 1
+		}
+	}
+}
